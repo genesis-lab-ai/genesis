@@ -8,7 +8,11 @@ class CityGraph:
     Stores all zones and the connections between them.
     """
 
-    def __init__(self):
+    def __init__(self, rows: int, cols: int):
+        # City dimensions
+        self.rows = rows
+        self.cols = cols
+
         # Maps zone_id -> Zone object
         self.zones: dict[int, Zone] = {}
 

@@ -55,7 +55,10 @@ class CityGenerator:
 
     def generate(self) -> CityGraph:
 
-        city = CityGraph()
+        city = CityGraph(
+             rows=self.rows,
+             cols=self.cols,
+             )
 
         planner = CityPlanner(self.rows, self.cols)
         layout = planner.create_layout()
