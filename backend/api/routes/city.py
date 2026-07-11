@@ -8,6 +8,8 @@ router = APIRouter()
 @router.get("/city")
 def get_city():
 
-    from api.app import city
+    from api.app import simulation_state
 
-    return serialize_city(city)
+    return serialize_city(
+        simulation_state.get_city()
+    )
