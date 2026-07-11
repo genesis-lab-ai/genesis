@@ -1,5 +1,10 @@
+import random
+
+from .. import constants
 from .city_graph import CityGraph
+from .planner import CityPlanner
 from .zone import Zone
+from .zone_type import ZoneType
 
 
 class CityGenerator:
@@ -11,8 +16,49 @@ class CityGenerator:
         self.rows = rows
         self.cols = cols
 
+    def _initialize_zone(self, zone: Zone) -> None:
+        """
+        Assign initial values to a zone based on its type.
+        """
+
+        if zone.zone_type is ZoneType.RESIDENTIAL:
+            zone.population = random.randint(*constants.RESIDENTIAL_POPULATION)
+            zone.employment = random.randint(*constants.RESIDENTIAL_EMPLOYMENT)
+            zone.land_value = random.uniform(*constants.RESIDENTIAL_LAND_VALUE)
+            zone.pollution = random.uniform(*constants.RESIDENTIAL_POLLUTION)
+            zone.traffic = random.uniform(*constants.RESIDENTIAL_TRAFFIC)
+            zone.happiness = random.uniform(*constants.RESIDENTIAL_HAPPINESS)
+
+        elif zone.zone_type is ZoneType.COMMERCIAL:
+            zone.population = 0
+            zone.employment = random.randint(*constants.COMMERCIAL_EMPLOYMENT)
+            zone.land_value = random.uniform(*constants.COMMERCIAL_LAND_VALUE)
+            zone.pollution = random.uniform(*constants.COMMERCIAL_POLLUTION)
+            zone.traffic = random.uniform(*constants.COMMERCIAL_TRAFFIC)
+            zone.happiness = random.uniform(*constants.COMMERCIAL_HAPPINESS)
+
+        elif zone.zone_type is ZoneType.INDUSTRIAL:
+            zone.population = 0
+            zone.employment = random.randint(*constants.INDUSTRIAL_EMPLOYMENT)
+            zone.land_value = random.uniform(*constants.INDUSTRIAL_LAND_VALUE)
+            zone.pollution = random.uniform(*constants.INDUSTRIAL_POLLUTION)
+            zone.traffic = random.uniform(*constants.INDUSTRIAL_TRAFFIC)
+            zone.happiness = random.uniform(*constants.INDUSTRIAL_HAPPINESS)
+
+        elif zone.zone_type is ZoneType.PARK:
+            zone.population = 0
+            zone.employment = random.randint(*constants.PARK_EMPLOYMENT)
+            zone.land_value = random.uniform(*constants.PARK_LAND_VALUE)
+            zone.pollution = 0
+            zone.traffic = random.uniform(*constants.PARK_TRAFFIC)
+            zone.happiness = 100
+
     def generate(self) -> CityGraph:
+
         city = CityGraph()
+
+        planner = CityPlanner(self.rows, self.cols)
+        layout = planner.create_layout()
 
         zone_id = 1
 
@@ -23,10 +69,12 @@ class CityGenerator:
                 zone = Zone(
                     id=zone_id,
                     name=f"Zone {zone_id}",
-                    zone_type="Residential",
+                    zone_type=layout[x][y],
                     x=x,
                     y=y,
                 )
+
+                self._initialize_zone(zone)
 
                 city.add_zone(zone)
 
@@ -42,18 +90,13 @@ class CityGenerator:
 
             # Right neighbor
             if y + 1 < self.cols:
-                city.connect_zones(
-                    current_id,
-                    current_id + 1
-                )
+                city.connect_zones(current_id, current_id + 1)
 
             # Bottom neighbor
             if x + 1 < self.rows:
+
                 bottom_id = current_id + self.cols
 
-                city.connect_zones(
-                    current_id,
-                    bottom_id
-                )
+                city.connect_zones(current_id, bottom_id)
 
         return city
