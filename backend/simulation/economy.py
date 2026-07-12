@@ -1,11 +1,19 @@
 class Economy:
     """
-    Handles city-wide economic updates after each simulation tick.
+    Updates economic indicators for the simulation.
     """
 
-    def update(self, world_state):
+    @staticmethod
+    def calculate_household_satisfaction(household, zone):
         """
-        Update the economic state of the city.
+        Calculate satisfaction based on the zone where the household lives.
         """
 
-        print("Economy updated")
+        satisfaction = zone.happiness
+
+        satisfaction -= zone.pollution * 0.2
+        satisfaction -= zone.traffic * 0.2
+
+        satisfaction += zone.land_value * 0.1
+
+        return max(0.0, min(1.0, satisfaction))
