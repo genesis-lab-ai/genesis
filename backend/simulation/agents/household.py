@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from simulation.decisions import Decision
 from simulation.decisions import DecisionEngine
+
 
 @dataclass
 class Household:
@@ -17,4 +17,4 @@ class Household:
     relocated: bool = False
 
     def make_decision(self, world_state):
-      return DecisionEngine.household_decision(self, world_state)
+        return DecisionEngine.household_decision(self, world_state)
