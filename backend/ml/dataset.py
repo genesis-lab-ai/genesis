@@ -54,3 +54,5 @@ class DatasetGenerator:
                 ])
 
         print(f"{samples} rows generated.")
+if __name__ == "__main__":
+    DatasetGenerator.generate()
