@@ -1,6 +1,5 @@
 from enum import Enum
-
-
+from simulation.economy import Economy
 class Decision(Enum):
     STAY = "stay"
     WAIT = "wait"
@@ -15,13 +14,15 @@ class DecisionEngine:
 
     @staticmethod
     def household_decision(household, world_state):
-        if household.satisfaction < 0.4:
-            return Decision.RELOCATE
-
-        if household.satisfaction < 0.7:
-            return Decision.WAIT
-
-        return Decision.STAY
+      """Decide whether the household should stay, wait, or relocate."""
+      zone = world_state.city.get_zone(household.home_zone)
+      utility = Economy.household_utility(household, zone)
+      household.satisfaction = utility
+      if utility < 0.4:
+        return Decision.RELOCATE
+      if utility < 0.7:
+        return Decision.WAIT
+      return Decision.STAY
 
     @staticmethod
     def business_decision(business, world_state):
