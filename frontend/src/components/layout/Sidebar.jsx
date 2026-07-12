@@ -4,6 +4,8 @@ import {
   HiOutlineMapPin,
   HiOutlineChartBar,
   HiOutlineBolt,
+  HiOutlineClipboardDocumentList,
+  HiOutlineUserGroup,
   HiOutlineCog6Tooth,
 } from "react-icons/hi2";
 import { cn } from "../../lib/cn";
@@ -13,6 +15,9 @@ const NAV_ITEMS = [
   { to: "/dashboard/city", label: "City", icon: HiOutlineMapPin },
   { to: "/dashboard/statistics", label: "Statistics", icon: HiOutlineChartBar },
   { to: "/dashboard/events", label: "Events", icon: HiOutlineBolt },
+  { to: "/dashboard/policy", label: "Policy Panel", icon: HiOutlineClipboardDocumentList },
+  { to: "/dashboard/agents", label: "Agent Inspector", icon: HiOutlineUserGroup },
+  // Still a genuine placeholder — no page built for this yet.
   { to: "/dashboard/settings", label: "Settings", icon: HiOutlineCog6Tooth, disabled: true },
 ];
 
@@ -41,6 +46,7 @@ export default function Sidebar() {
               className={({ isActive }) =>
                 cn(
                   "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-inset",
                   isActive
                     ? "bg-gradient-to-r from-accent-soft to-transparent text-accent shadow-[inset_1px_0_0_var(--color-accent)]"
                     : "text-text-secondary hover:text-text-primary hover:bg-surface-raised"

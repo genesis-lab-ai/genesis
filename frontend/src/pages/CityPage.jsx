@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import CityGrid from "../components/city/CityGrid";
+import DetailRow from "../components/ui/DetailRow";
+import LoadingState from "../components/ui/LoadingState";
 import { getCity } from "../services/cityService";
 import { ZONE_LABELS } from "../mock/city";
 
@@ -21,11 +23,7 @@ export default function CityPage() {
   }, []);
 
   if (!city) {
-    return (
-      <div className="flex h-full items-center justify-center text-text-secondary">
-        Loading Genesis...
-      </div>
-    );
+    return <LoadingState />;
   }
 
   return (
@@ -46,36 +44,13 @@ export default function CityPage() {
         </h2>
 
         {selectedZone ? (
-          <div className="space-y-3">
-            <div>
-              <p className="text-[11px] text-text-tertiary">Type</p>
-              <p className="text-sm text-text-primary">
-                {ZONE_LABELS[selectedZone.type]}
-              </p>
-            </div>
-
-            <div>
-              <p className="text-[11px] text-text-tertiary">Coordinates</p>
-              <p className="text-sm text-text-primary font-mono">
-                {selectedZone.x}, {selectedZone.y}
-              </p>
-            </div>
-
+          <div className="fade-in-up">
+            <DetailRow label="Type" value={ZONE_LABELS[selectedZone.type] ?? selectedZone.type} />
+            <DetailRow label="Coordinates" value={`${selectedZone.x}, ${selectedZone.y}`} />
             {selectedZone.type !== "road" && (
               <>
-                <div>
-                  <p className="text-[11px] text-text-tertiary">Rent</p>
-                  <p className="text-sm text-text-primary font-mono">
-                    ${selectedZone.rent}/mo
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-[11px] text-text-tertiary">Employment</p>
-                  <p className="text-sm text-text-primary font-mono">
-                    {selectedZone.employment} jobs
-                  </p>
-                </div>
+                <DetailRow label="Rent" value={`$${selectedZone.rent}/mo`} />
+                <DetailRow label="Employment" value={`${selectedZone.employment} jobs`} />
               </>
             )}
           </div>

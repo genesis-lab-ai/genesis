@@ -1,11 +1,11 @@
-import { HiOutlineBolt, HiOutlineCog6Tooth } from "react-icons/hi2";
 import { cn } from "../../lib/cn";
+import { getEventType } from "../../lib/eventTypes";
 
 /**
  * EventTimeline — a vertical dotted-line timeline with glowing nodes per
- * event. Pulled from the reference boards' dotted-line-with-lit-nodes
- * pattern, applied to actual simulation event history rather than
- * decoration.
+ * event. Reads its icon/color from the shared EVENT_TYPES config (see
+ * lib/eventTypes.js) rather than hardcoding per-type logic here, so
+ * adding a new event category doesn't require touching this component.
  */
 export default function EventTimeline({ events }) {
   if (!events?.length) {
@@ -28,35 +28,34 @@ export default function EventTimeline({ events }) {
 
       <div className="flex flex-col gap-5">
         {events.map((e, i) => {
-          const isShock = e.type === "shock";
+          const eventType = getEventType(e.type);
+          const Icon = eventType.icon;
+          const isHighlighted = e.type === "shock" || e.type === "policy";
+
           return (
             <div key={e.id} className="relative">
               {/* Node */}
               <div
                 className={cn(
                   "absolute -left-8 top-0.5 h-[18px] w-[18px] rounded-full flex items-center justify-center",
-                  isShock ? "bg-accent" : "bg-surface-raised border border-border"
+                  isHighlighted ? "bg-accent" : "bg-surface-raised border border-border"
                 )}
                 style={
-                  isShock
+                  isHighlighted
                     ? { boxShadow: "0 0 0 4px var(--color-accent-soft), 0 0 16px rgba(225,29,72,0.7)" }
                     : i === 0
                     ? { boxShadow: "0 0 0 4px rgba(255,255,255,0.06)" }
                     : undefined
                 }
               >
-                {isShock ? (
-                  <HiOutlineBolt size={10} className="text-white" />
-                ) : (
-                  <HiOutlineCog6Tooth size={9} className="text-text-tertiary" />
-                )}
+                <Icon size={10} className={isHighlighted ? "text-white" : "text-text-tertiary"} />
               </div>
 
               {/* Card */}
               <div
                 className={cn(
                   "glass rounded-lg px-3.5 py-2.5 border",
-                  isShock ? "border-accent/30 bg-accent-soft" : "border-border-soft bg-surface"
+                  isHighlighted ? "border-accent/30 bg-accent-soft" : "border-border-soft bg-surface"
                 )}
               >
                 <p className="text-sm text-text-primary leading-snug">{e.label}</p>

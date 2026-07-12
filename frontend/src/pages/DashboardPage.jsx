@@ -12,6 +12,8 @@ import {
 import CityGrid from "../components/city/CityGrid";
 import StatCard from "../components/ui/StatCard";
 import ControlPanel from "../components/layout/ControlPanel";
+import LoadingState from "../components/ui/LoadingState";
+import DetailRow from "../components/ui/DetailRow";
 
 import { ZONE_LABELS } from "../mock/city";
 import { getCity } from "../services/cityService";
@@ -53,11 +55,7 @@ export default function DashboardPage() {
   }, []);
 
   if (!city || !metrics) {
-    return (
-      <div className="flex h-full items-center justify-center text-text-secondary">
-        Loading Genesis...
-      </div>
-    );
+    return <LoadingState />;
   }
 
   const METRIC_CARDS = [
@@ -159,36 +157,22 @@ export default function DashboardPage() {
           ))}
 
           {selectedZone ? (
-            <div className="glass col-span-2 rounded-xl border border-accent/30 bg-accent-soft p-3 mt-1">
-              <p className="text-[11px] uppercase tracking-wider text-accent mb-1">
-                Selected zone
-              </p>
-
-              <p className="text-xs text-text-secondary font-mono">
-                {selectedZone.id}
-              </p>
-
-              <div className="mt-3 space-y-1 text-xs">
-                <p>
-                  <strong>Type:</strong>{" "}
-                  {ZONE_LABELS[selectedZone.type] ?? selectedZone.type}
+            <div className="glass col-span-2 rounded-xl border border-accent/30 bg-accent-soft p-3 mt-1 fade-in-up">
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-[11px] uppercase tracking-wider text-accent">
+                  Selected zone
                 </p>
-
-                <p>
-                  <strong>Population:</strong> {selectedZone.population}
+                <p className="text-[10px] text-text-tertiary font-mono">
+                  {selectedZone.id}
                 </p>
+              </div>
 
-                <p>
-                  <strong>Employment:</strong> {selectedZone.employment}
-                </p>
-
-                <p>
-                  <strong>Pollution:</strong> {selectedZone.pollution}
-                </p>
-
-                <p>
-                  <strong>Happiness:</strong> {selectedZone.happiness}
-                </p>
+              <div className="mt-2">
+                <DetailRow label="Type" value={ZONE_LABELS[selectedZone.type] ?? selectedZone.type} />
+                <DetailRow label="Population" value={selectedZone.population} />
+                <DetailRow label="Employment" value={selectedZone.employment} />
+                <DetailRow label="Pollution" value={selectedZone.pollution} />
+                <DetailRow label="Happiness" value={selectedZone.happiness} />
               </div>
             </div>
           ) : null}

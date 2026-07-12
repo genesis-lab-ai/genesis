@@ -45,7 +45,8 @@ export default function ControlPanel({
             key={s}
             onClick={() => onSpeedChange(s)}
             className={cn(
-              "h-7 w-9 rounded text-xs font-mono transition-colors",
+              "h-7 w-9 rounded text-xs font-mono transition-all duration-150 active:scale-[0.94]",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60",
               speed === s
                 ? "bg-accent-soft text-accent"
                 : "text-text-secondary hover:bg-surface-raised"
@@ -60,6 +61,7 @@ export default function ControlPanel({
 
       <div className="flex items-center gap-1.5 font-mono text-xs text-text-secondary">
         <span className="text-text-tertiary uppercase tracking-wider text-[10px]">Tick</span>
+        {isRunning ? <span className="h-1.5 w-1.5 rounded-full bg-positive animate-pulse" /> : null}
         <span className="tabular-nums">{String(tick).padStart(5, "0")}</span>
       </div>
 

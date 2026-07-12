@@ -24,12 +24,12 @@ export function generateTimeSeries(ticks, { base, drift = 0, volatility = 0.05, 
 }
 
 export const METRIC_DEFS = {
-  population: { label: "Population", base: 42000, drift: 12, volatility: 0.01, color: "var(--color-data)" },
-  rent: { label: "Average Rent", base: 1150, drift: 2, volatility: 0.03, color: "var(--color-accent)" },
-  employment: { label: "Employment", base: 68, drift: 0.05, volatility: 0.02, color: "var(--color-positive)" },
-  traffic: { label: "Traffic Load", base: 54, drift: 0.1, volatility: 0.06, color: "var(--color-negative)" },
-  pollution: { label: "Pollution Index", base: 31, drift: -0.02, volatility: 0.05, color: "#9B7BC7" },
-  budget: { label: "City Budget", base: 2.4, drift: 0.01, volatility: 0.04, color: "var(--color-data)" },
+  population: { label: "Population", base: 42000, drift: 12, volatility: 0.01, color: "var(--color-data)", unit: "" },
+  employment: { label: "Employment", base: 68, drift: 0.05, volatility: 0.02, color: "var(--color-positive)", unit: "%" },
+  happiness: { label: "Happiness", base: 74, drift: 0.03, volatility: 0.02, color: "#F5B942", unit: "/100" },
+  pollution: { label: "Pollution Index", base: 31, drift: -0.02, volatility: 0.05, color: "#9B7BC7", unit: "" },
+  traffic: { label: "Traffic Load", base: 54, drift: 0.1, volatility: 0.06, color: "var(--color-negative)", unit: "" },
+  landValue: { label: "Land Value", base: 1150, drift: 2, volatility: 0.03, color: "var(--color-accent)", unit: "$" },
 };
 
 export function zoneDistribution(zones) {

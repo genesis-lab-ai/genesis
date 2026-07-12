@@ -1,9 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-from simulation.city.generator import CityGenerator
-from simulation.state.simulation_state import SimulationState
-
+from api.routes.simulation import router as simulation_router
+from simulation.app_state import simulation_state, simulation_engine
 from api.routes.city import router as city_router
 from api.routes.metrics import router as metrics_router
 
@@ -31,11 +29,6 @@ app.add_middleware(
 # Create ONE simulation state
 # -------------------------------------------------
 
-generator = CityGenerator(rows=20, cols=20)
-city = generator.generate()
-
-simulation_state = SimulationState(city)
-
 # -------------------------------------------------
 # Routes
 # -------------------------------------------------
@@ -50,3 +43,4 @@ def root():
 
 app.include_router(city_router)
 app.include_router(metrics_router)
+app.include_router(simulation_router)

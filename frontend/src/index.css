@@ -200,3 +200,10 @@ body::after {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Added for the city grid ambient-life pass — used only by ZoneTile.
+   Purely additive, doesn't touch anything above. */
+@keyframes city-twinkle {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}

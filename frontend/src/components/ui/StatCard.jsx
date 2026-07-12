@@ -1,4 +1,4 @@
-import { cn } from "../../lib/cn";
+import MiniTrend from "../charts/MiniTrend";
 
 /**
  * StatCard — reusable metric display for the right panel.
@@ -24,13 +24,8 @@ export default function StatCard({ label, value, unit, trend, trendValue, icon: 
         {unit ? <span className="text-xs text-text-secondary">{unit}</span> : null}
       </div>
       {trend ? (
-        <div
-          className={cn(
-            "relative mt-1 text-[11px] font-mono",
-            trend === "up" ? "text-positive" : trend === "down" ? "text-negative" : "text-text-tertiary"
-          )}
-        >
-          {trend === "up" ? "▲" : trend === "down" ? "▼" : "–"} {trendValue}
+        <div className="relative mt-1">
+          <MiniTrend trend={trend} value={trendValue} />
         </div>
       ) : null}
     </div>
