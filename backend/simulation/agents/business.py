@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from simulation.decisions import Decision
-
+from simulation.decisions import DecisionEngine
 
 @dataclass
 class Business:
@@ -26,11 +26,4 @@ class Business:
     relocated: bool = False
 
     def make_decision(self, world_state):
-        """
-        Temporary rule-based business decision.
-        """
-
-        if self.profit < 0:
-            return Decision.RELOCATE
-
-        return Decision.STAY
+      return DecisionEngine.business_decision(self, world_state)

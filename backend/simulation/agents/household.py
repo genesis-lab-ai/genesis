@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from simulation.decisions import Decision
-
+from simulation.decisions import DecisionEngine
 
 @dataclass
 class Household:
@@ -16,16 +16,5 @@ class Household:
     satisfaction: float = 1.0
     relocated: bool = False
 
-    def make_decision(self):
-        """
-        Temporary rule-based decision.
-        Later this will use the ML relocation model.
-        """
-
-        if self.satisfaction < 0.4:
-            return Decision.RELOCATE
-
-        if self.satisfaction < 0.7:
-            return Decision.WAIT
-
-        return Decision.STAY
+    def make_decision(self, world_state):
+      return DecisionEngine.household_decision(self, world_state)

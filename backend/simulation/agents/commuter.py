@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-
+from simulation.decisions import DecisionEngine
 
 @dataclass
 class Commuter:
@@ -26,4 +26,4 @@ class Commuter:
         metro availability and cost.
         """
 
-        return self.preferred_transport
+        return DecisionEngine.commuter_decision(self, world_state)
