@@ -1,5 +1,5 @@
 from enum import Enum
-from simulation.economy import Economy
+from simulation.utility import UtilityCalculator
 class Decision(Enum):
     STAY = "stay"
     WAIT = "wait"
@@ -16,7 +16,7 @@ class DecisionEngine:
     def household_decision(household, world_state):
       """Decide whether the household should stay, wait, or relocate."""
       zone = world_state.city.get_zone(household.home_zone)
-      utility = Economy.household_utility(household, zone)
+      utility = UtilityCalculator.household_score(zone)
       household.satisfaction = utility
       if utility < 0.4:
         return Decision.RELOCATE
