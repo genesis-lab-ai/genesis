@@ -1,19 +1,24 @@
 class Economy:
     """
-    Updates economic indicators for the simulation.
+    Calculates economic utility for agents.
     """
 
     @staticmethod
-    def calculate_household_satisfaction(household, zone):
+    def household_utility(household, zone):
         """
-        Calculate satisfaction based on the zone where the household lives.
+        Calculate a household utility score between 0 and 1.
         """
 
-        satisfaction = zone.happiness
+        utility = 0.0
 
-        satisfaction -= zone.pollution * 0.2
-        satisfaction -= zone.traffic * 0.2
+        # Zone quality
+        utility += zone.happiness * 0.40
 
-        satisfaction += zone.land_value * 0.1
+        # Negative factors
+        utility -= zone.pollution * 0.20
+        utility -= zone.traffic * 0.20
 
-        return max(0.0, min(1.0, satisfaction))
+        # Positive factor
+        utility += zone.land_value * 0.20
+
+        return max(0.0, min(1.0, utility))
