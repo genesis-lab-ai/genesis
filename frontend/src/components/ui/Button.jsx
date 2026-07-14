@@ -9,6 +9,12 @@ const VARIANTS = {
     "bg-transparent text-text-secondary hover:text-text-primary hover:bg-surface-raised",
   danger:
     "bg-transparent text-negative border border-negative/40 hover:bg-negative/10",
+  // Added during the UX audit pass to replace a fragile inline className
+  // override on ControlPanel's "Inject policy shock" button — that
+  // override was fighting `secondary`'s own border/text classes for
+  // specificity, which Tailwind doesn't reliably resolve by source order.
+  "accent-outline":
+    "bg-transparent text-accent border border-accent/40 hover:bg-accent-soft",
 };
 
 const SIZES = {

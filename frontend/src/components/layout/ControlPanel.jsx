@@ -68,11 +68,10 @@ export default function ControlPanel({
       <div className="flex-1" />
 
       <Button
-        variant="secondary"
+        variant="accent-outline"
         size="sm"
         icon={HiOutlineBolt}
         onClick={onInjectShock}
-        className="border-accent/40 text-accent hover:bg-accent-soft"
       >
         Inject policy shock
       </Button>

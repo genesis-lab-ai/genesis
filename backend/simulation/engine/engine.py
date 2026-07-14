@@ -1,10 +1,5 @@
 from simulation.state.simulation_state import SimulationState
-from simulation.systems.population import PopulationSystem
-from simulation.systems.traffic import TrafficSystem
-from simulation.systems.pollution import PollutionSystem
-from simulation.systems.economy import EconomySystem
-from simulation.systems.happiness import HappinessSystem
-
+from simulation.systems.registry import SYSTEMS
 class SimulationEngine:
     """
     Controls the execution of the city simulation.
@@ -33,11 +28,8 @@ class SimulationEngine:
         Advance the simulation by one tick.
         """
 
-        PopulationSystem.update(self.state)
-        TrafficSystem.update(self.state)
-        PollutionSystem.update(self.state)
-        EconomySystem.update(self.state)
-        HappinessSystem.update(self.state)
+        for system in SYSTEMS:
+          system.update(self.state)
 
         self.state.advance_tick()
 

@@ -1,5 +1,4 @@
-import { cn } from "../../lib/cn";
-import { ZONE_COLOR_HEX } from "../../lib/zoneColors";
+import RoadTile from "./RoadTile";
 
 /**
  * RoadLayer — renders road cells as their own layer, deliberately kept
@@ -8,60 +7,31 @@ import { ZONE_COLOR_HEX } from "../../lib/zoneColors";
  *
  * Each road cell is placed via explicit CSS grid coordinates so this can
  * be mapped independently of the zones list and still land correctly in
- * the shared CityGrid grid container.
+ * the shared CityGrid grid container. `focusedCoord` is used the same
+ * way ZoneTile's `tabIndex` is — CityGrid owns the roving-tabindex state
+ * for the whole grid, roads included.
+ *
+ * Actual per-tile rendering lives in RoadTile (memoized) — this
+ * component's only job is mapping the roads list and resolving each
+ * tile's selected/focus state.
  */
-export default function RoadLayer({ roads = [], size, onSelectRoad, selectedZone }) {
+export default function RoadLayer({ roads = [], size, onSelectRoad, selectedZone, focusedCoord, onHoverCell }) {
   return (
     <>
       {roads.map((road) => {
-        // The city's road rule (see mock/city.js) is: a cell is a road
-        // if x%4===0 or y%4===0. A cell where BOTH are true is a 4-way
-        // intersection. This only reads road.x/road.y — no new data or
-        // prop needed — so it stays correct for any city the backend
-        // eventually sends, as long as it follows the same convention.
-        const isVertical = road.x % 4 === 0;
-        const isHorizontal = road.y % 4 === 0;
-        const isIntersection = isVertical && isHorizontal;
+        const isSelected = selectedZone?.id === road.id;
+        const isFocusTarget = isSelected || (focusedCoord?.x === road.x && focusedCoord?.y === road.y);
 
         return (
-          <div
+          <RoadTile
             key={road.id}
-            role={onSelectRoad ? "button" : undefined}
-            onClick={onSelectRoad ? () => onSelectRoad(road) : undefined}
-            title={`road · ${road.id}`}
-            style={{
-              width: size,
-              height: size,
-              gridColumnStart: road.x + 1,
-              gridRowStart: road.y + 1,
-              backgroundColor: ZONE_COLOR_HEX.road,
-              backgroundImage: "linear-gradient(155deg, rgba(255,255,255,0.04), rgba(0,0,0,0.12))",
-            }}
-            className={cn(
-              "relative border border-transparent",
-              selectedZone?.id === road.id && "ring-2 ring-accent ring-offset-1 ring-offset-canvas z-10"
-            )}
-          >
-            {/* Center line(s) — gives roads a direction instead of
-                reading as a flat gray block. */}
-            {isVertical && !isIntersection && (
-              <span className="absolute left-1/2 top-0 bottom-0 w-px -translate-x-1/2 bg-white/10" />
-            )}
-            {isHorizontal && !isIntersection && (
-              <span className="absolute top-1/2 left-0 right-0 h-px -translate-y-1/2 bg-white/10" />
-            )}
-
-            {/* Intersections get a faint warm glow — a small nod to the
-                "city lights at night" motif used elsewhere in the app. */}
-            {isIntersection && (
-              <span
-                className="absolute inset-0 rounded-full"
-                style={{
-                  background: "radial-gradient(circle, rgba(225,29,72,0.18) 0%, transparent 70%)",
-                }}
-              />
-            )}
-          </div>
+            road={road}
+            size={size}
+            onSelectRoad={onSelectRoad}
+            isSelected={isSelected}
+            isFocusTarget={isFocusTarget}
+            onHoverCell={onHoverCell}
+          />
         );
       })}
     </>

@@ -1,21 +1,23 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   HiOutlineUsers,
   HiOutlineBriefcase,
   HiOutlineHomeModern,
   HiOutlineTruck,
   HiOutlineCloud,
-  HiOutlineBanknotes,
+  HiOutlineIdentification,
   HiOutlineFaceSmile,
 } from "react-icons/hi2";
 
 import CityGrid from "../components/city/CityGrid";
+import CityGridSkeleton from "../components/city/CityGridSkeleton";
 import StatCard from "../components/ui/StatCard";
+import StatCardSkeleton from "../components/ui/StatCardSkeleton";
 import ControlPanel from "../components/layout/ControlPanel";
-import LoadingState from "../components/ui/LoadingState";
-import DetailRow from "../components/ui/DetailRow";
+import ErrorState from "../components/ui/ErrorState";
+import SectionHeader from "../components/ui/SectionHeader";
+import ZoneInspectorPanel from "../components/ui/ZoneInspectorPanel";
 
-import { ZONE_LABELS } from "../mock/city";
 import { getCity } from "../services/cityService";
 import { getMetrics } from "../services/metricsService";
 
@@ -32,76 +34,50 @@ export default function DashboardPage() {
 
   const [city, setCity] = useState(null);
   const [metrics, setMetrics] = useState(null);
+  const [loadError, setLoadError] = useState(null);
 
   const [selectedZone, setSelectedZone] = useState(null);
   const [shockedZoneIds, setShockedZoneIds] = useState([]);
 
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const [cityData, metricsData] = await Promise.all([
-          getCity(),
-          getMetrics(),
-        ]);
-
-        setCity(cityData);
-        setMetrics(metricsData);
-      } catch (error) {
-        console.error(error);
-      }
+  const loadData = useCallback(async () => {
+    setLoadError(null);
+    try {
+      const [cityData, metricsData] = await Promise.all([getCity(), getMetrics()]);
+      setCity(cityData);
+      setMetrics(metricsData);
+    } catch (error) {
+      console.error(error);
+      // Surfaced to the user instead of just the console — matters more
+      // once this is polling/streaming live data, where a transient
+      // failure shouldn't silently strand the page on a loading spinner.
+      setLoadError("Couldn't load the city and metrics data.");
     }
-
-    loadData();
   }, []);
 
-  if (!city || !metrics) {
-    return <LoadingState />;
-  }
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
-  const METRIC_CARDS = [
-    {
-      label: "Population",
-      value: metrics.population.toLocaleString(),
-      icon: HiOutlineUsers,
-    },
-    {
-      label: "Employment",
-      value: `${metrics.employment_rate}%`,
-      icon: HiOutlineBriefcase,
-    },
-    {
-      label: "Land Value",
-      value: `₹${metrics.average_land_value}`,
-      icon: HiOutlineHomeModern,
-    },
-    {
-      label: "Traffic",
-      value: metrics.average_traffic,
-      unit: "/100",
-      icon: HiOutlineTruck,
-    },
-    {
-      label: "Pollution",
-      value: metrics.average_pollution,
-      unit: "/100",
-      icon: HiOutlineCloud,
-    },
-    {
-      label: "Jobs",
-      value: metrics.employment.toLocaleString(),
-      icon: HiOutlineBanknotes,
-    },
-    {
-      label: "Happiness",
-      value: metrics.average_happiness,
-      unit: "/100",
-      icon: HiOutlineFaceSmile,
-    },
-  ];
+  // Recomputed only when `metrics` actually changes, not on every
+  // render (e.g. from selecting a zone or a shock highlight timing out) —
+  // matters more once metrics refresh live on an interval.
+  const METRIC_CARDS = useMemo(() => {
+    if (!metrics) return [];
+    return [
+      { label: "Population", value: metrics.population.toLocaleString(), icon: HiOutlineUsers },
+      { label: "Employment", value: `${metrics.employment_rate}%`, icon: HiOutlineBriefcase },
+      { label: "Land Value", value: `₹${metrics.average_land_value}`, icon: HiOutlineHomeModern },
+      { label: "Traffic", value: metrics.average_traffic, unit: "/100", icon: HiOutlineTruck },
+      { label: "Pollution", value: metrics.average_pollution, unit: "/100", icon: HiOutlineCloud },
+      // Was HiOutlineBanknotes — a currency icon for a jobs count read
+      // oddly next to "Employment" (already using the briefcase icon).
+      { label: "Jobs", value: metrics.employment.toLocaleString(), icon: HiOutlineIdentification },
+      { label: "Happiness", value: metrics.average_happiness, unit: "/100", icon: HiOutlineFaceSmile },
+    ];
+  }, [metrics]);
 
   const handleInjectShock = () => {
     const preset = SHOCK_PRESETS[sim.events.length % SHOCK_PRESETS.length];
-
     sim.injectShock(preset);
 
     const sample = [...city.zones]
@@ -110,11 +86,33 @@ export default function DashboardPage() {
       .map((z) => z.id);
 
     setShockedZoneIds(sample);
-
-    setTimeout(() => {
-      setShockedZoneIds([]);
-    }, 2500);
+    setTimeout(() => setShockedZoneIds([]), 2500);
   };
+
+  if (loadError) {
+    return <ErrorState message={loadError} onRetry={loadData} />;
+  }
+
+  if (!city || !metrics) {
+    // Shaped like the real layout (grid + metrics panel) rather than a
+    // centered spinner, so loading feels like the city "arriving"
+    // instead of a jump-cut from an unrelated screen.
+    return (
+      <div className="h-full flex">
+        <div className="flex-1 min-w-0 flex flex-col">
+          <CityGridSkeleton />
+        </div>
+        <aside className="glass w-72 shrink-0 border-l border-border bg-surface overflow-y-auto p-3">
+          <SectionHeader>City metrics</SectionHeader>
+          <div className="grid grid-cols-2 gap-2.5">
+            {Array.from({ length: 7 }).map((_, i) => (
+              <StatCardSkeleton key={i} />
+            ))}
+          </div>
+        </aside>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full flex">
@@ -141,41 +139,31 @@ export default function DashboardPage() {
       </div>
 
       <aside className="glass w-72 shrink-0 border-l border-border bg-surface overflow-y-auto p-3">
-        <h2 className="text-[11px] uppercase tracking-wider text-text-tertiary px-1 mb-2">
-          City metrics
-        </h2>
+        <SectionHeader>City metrics</SectionHeader>
 
         <div className="grid grid-cols-2 gap-2.5">
           {METRIC_CARDS.map((card, i) => (
-            <div
-              key={card.label}
-              className="fade-in-up"
-              style={{ animationDelay: `${i * 40}ms` }}
-            >
+            <div key={card.label} className="fade-in-up" style={{ animationDelay: `${i * 40}ms` }}>
               <StatCard {...card} />
             </div>
           ))}
+        </div>
 
-          {selectedZone ? (
-            <div className="glass col-span-2 rounded-xl border border-accent/30 bg-accent-soft p-3 mt-1 fade-in-up">
-              <div className="flex items-center justify-between mb-1">
-                <p className="text-[11px] uppercase tracking-wider text-accent">
-                  Selected zone
-                </p>
-                <p className="text-[10px] text-text-tertiary font-mono">
-                  {selectedZone.id}
-                </p>
-              </div>
-
-              <div className="mt-2">
-                <DetailRow label="Type" value={ZONE_LABELS[selectedZone.type] ?? selectedZone.type} />
-                <DetailRow label="Population" value={selectedZone.population} />
-                <DetailRow label="Employment" value={selectedZone.employment} />
-                <DetailRow label="Pollution" value={selectedZone.pollution} />
-                <DetailRow label="Happiness" value={selectedZone.happiness} />
-              </div>
-            </div>
-          ) : null}
+        <div className="mt-3">
+          <ZoneInspectorPanel
+            selectedZone={selectedZone}
+            emptyHint="Click a zone on the map to inspect it here."
+            fields={
+              selectedZone
+                ? [
+                    { label: "Population", value: selectedZone.population },
+                    { label: "Employment", value: selectedZone.employment },
+                    { label: "Pollution", value: selectedZone.pollution },
+                    { label: "Happiness", value: selectedZone.happiness },
+                  ]
+                : []
+            }
+          />
         </div>
       </aside>
     </div>

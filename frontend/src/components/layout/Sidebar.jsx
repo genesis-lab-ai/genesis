@@ -23,7 +23,7 @@ const NAV_ITEMS = [
 
 export default function Sidebar() {
   return (
-    <nav className="glass w-56 shrink-0 border-r border-border bg-surface flex flex-col py-4">
+    <nav aria-label="Main navigation" className="glass w-56 shrink-0 border-r border-border bg-surface flex flex-col py-4">
       <div className="flex flex-col gap-0.5 px-3">
         {NAV_ITEMS.map(({ to, label, icon: Icon, disabled }) =>
           disabled ? (
