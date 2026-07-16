@@ -9,7 +9,7 @@ import {
   HiOutlineFaceSmile,
 } from "react-icons/hi2";
 
-import CityView from "../components/city/CityView";
+import CityGrid from "../components/city/CityGrid";
 import CityGridSkeleton from "../components/city/CityGridSkeleton";
 import StatCard from "../components/ui/StatCard";
 import StatCardSkeleton from "../components/ui/StatCardSkeleton";
@@ -117,7 +117,7 @@ export default function DashboardPage() {
   return (
     <div className="h-full flex">
       <div className="flex-1 min-w-0 flex flex-col">
-        <CityView
+        <CityGrid
           city={city}
           zones={city.zones}
           roads={city.roads}

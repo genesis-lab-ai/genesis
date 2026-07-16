@@ -1,4 +1,5 @@
 from .zone import Zone
+from .road_edge import RoadEdge
 
 
 class CityGraph:
@@ -19,6 +20,12 @@ class CityGraph:
         # Maps zone_id -> List of connected zone_ids
         self.connections: dict[int, list[int]] = {}
 
+        # Maps road_id -> RoadEdge object
+        self.road_edges: dict[int, RoadEdge] = {}
+
+        # Auto-incrementing road ID
+        self._next_road_id = 1
+
     def add_zone(self, zone: Zone) -> None:
         """
         Add a new zone to the city.
@@ -26,7 +33,7 @@ class CityGraph:
         self.zones[zone.id] = zone
         self.connections[zone.id] = []
 
-    def connect_zones(self, zone1_id: int, zone2_id: int) -> None:
+    def connect_zones(self, zone1_id: int, zone2_id: int) -> RoadEdge:
         """
         Create a two-way connection between two zones.
         """
@@ -34,11 +41,33 @@ class CityGraph:
         if zone1_id not in self.zones or zone2_id not in self.zones:
             raise ValueError("Both zones must exist before connecting them.")
 
+        # Create the road only if it doesn't already exist
         if zone2_id not in self.connections[zone1_id]:
-            self.connections[zone1_id].append(zone2_id)
 
-        if zone1_id not in self.connections[zone2_id]:
+            self.connections[zone1_id].append(zone2_id)
             self.connections[zone2_id].append(zone1_id)
+
+            road = RoadEdge(
+                id=self._next_road_id,
+                from_zone=zone1_id,
+                to_zone=zone2_id,
+            )
+
+            self.road_edges[self._next_road_id] = road
+            self._next_road_id += 1
+
+            return road
+
+        # Road already exists, return it
+        for road in self.road_edges.values():
+            if (
+                (road.from_zone == zone1_id and road.to_zone == zone2_id)
+                or
+                (road.from_zone == zone2_id and road.to_zone == zone1_id)
+            ):
+                return road
+
+        raise RuntimeError("Road connection exists but RoadEdge could not be found.")
 
     def get_zone(self, zone_id: int) -> Zone:
         """

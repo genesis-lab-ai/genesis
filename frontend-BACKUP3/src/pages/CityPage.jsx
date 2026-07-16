@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import CityView from "../components/city/CityView";
+import CityGrid from "../components/city/CityGrid";
 import CityGridSkeleton from "../components/city/CityGridSkeleton";
 import ErrorState from "../components/ui/ErrorState";
 import ZoneInspectorPanel from "../components/ui/ZoneInspectorPanel";
@@ -45,7 +45,7 @@ export default function CityPage() {
   return (
     <div className="h-full flex">
       <div className="flex-1 min-w-0">
-        <CityView
+        <CityGrid
           city={city}
           zones={city.zones}
           roads={city.roads}

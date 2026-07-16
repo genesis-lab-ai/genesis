@@ -53,6 +53,44 @@ class CityGenerator:
             zone.traffic = random.uniform(*constants.PARK_TRAFFIC)
             zone.happiness = 100
 
+
+    def _configure_road(self, road, zone1, zone2):
+        """
+        Configure a road based on the zones it connects.
+        """
+
+        types = {zone1.zone_type, zone2.zone_type}
+
+        if len(types) == 1:
+
+            zone_type = next(iter(types))
+
+            if zone_type is ZoneType.RESIDENTIAL:
+                road.road_type = "local"
+                road.lanes = 2
+                road.capacity = 100
+
+            elif zone_type is ZoneType.COMMERCIAL:
+                road.road_type = "avenue"
+                road.lanes = 4
+                road.capacity = 250
+
+            elif zone_type is ZoneType.INDUSTRIAL:
+                road.road_type = "arterial"
+                road.lanes = 4
+                road.capacity = 350
+
+            elif zone_type is ZoneType.PARK:
+                road.road_type = "local"
+                road.lanes = 1
+                road.capacity = 40
+
+        else:
+            road.road_type = "collector"
+            road.lanes = 2
+            road.capacity = 180
+
+
     def generate(self) -> CityGraph:
 
         city = CityGraph(
@@ -84,6 +122,7 @@ class CityGenerator:
                 zone_id += 1
 
         # Connect neighboring zones
+        # Connect neighboring zones
         for zone in city.zones.values():
 
             x = zone.x
@@ -93,13 +132,30 @@ class CityGenerator:
 
             # Right neighbor
             if y + 1 < self.cols:
-                city.connect_zones(current_id, current_id + 1)
+
+                neighbor = city.get_zone(current_id + 1)
+
+                road = city.connect_zones(current_id, current_id + 1)
+
+                self._configure_road(
+                    road,
+                    zone,
+                    neighbor,
+                )
 
             # Bottom neighbor
             if x + 1 < self.rows:
 
                 bottom_id = current_id + self.cols
 
-                city.connect_zones(current_id, bottom_id)
+                neighbor = city.get_zone(bottom_id)
+
+                road = city.connect_zones(current_id, bottom_id)
+
+                self._configure_road(
+                    road,
+                    zone,
+                    neighbor,
+                )
 
         return city
