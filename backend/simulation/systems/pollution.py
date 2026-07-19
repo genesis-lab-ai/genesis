@@ -2,35 +2,36 @@ from simulation.city.zone_type import ZoneType
 
 
 class PollutionSystem:
-    """
-    Updates pollution levels across the city.
-    """
 
     @staticmethod
     def update(state):
-        """
-        Update pollution for every zone.
-        """
 
         city = state.city
 
         for zone in city.zones.values():
 
-            # Traffic contributes to pollution
-            if zone.traffic >= 80:
-                zone.pollution += 3
-            elif zone.traffic >= 60:
-                zone.pollution += 2
-            elif zone.traffic >= 40:
-                zone.pollution += 1
+            pollution = 0
 
-            # Industrial areas generate additional pollution
+            # -----------------------
+            # Traffic contribution
+            # -----------------------
+            if zone.traffic >= 9:
+                pollution += 3
+            elif zone.traffic >= 6:
+                pollution += 2
+            elif zone.traffic >= 3:
+                pollution += 1
+
+            # -----------------------
+            # Zone contribution
+            # -----------------------
             if zone.zone_type == ZoneType.INDUSTRIAL:
-                zone.pollution += 2
+                pollution += 2
 
-            # Parks help reduce pollution
+            elif zone.zone_type == ZoneType.COMMERCIAL:
+                pollution += 1
+
             elif zone.zone_type == ZoneType.PARK:
-                zone.pollution -= 2
+                pollution -= 2
 
-            # Keep pollution within bounds
-            zone.pollution = max(0, min(zone.pollution, 100))
+            zone.pollution = max(0, min(pollution, 100))

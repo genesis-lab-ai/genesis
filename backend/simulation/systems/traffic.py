@@ -9,24 +9,56 @@ class TrafficSystem:
     @staticmethod
     def update(state):
         """
-        Update traffic values for every zone.
+        Recalculate traffic for every zone.
         """
 
         city = state.city
 
         for zone in city.zones.values():
 
+            # -----------------------
+            # Base traffic by zone
+            # -----------------------
             if zone.zone_type == ZoneType.RESIDENTIAL:
-                zone.traffic += 1
+                base = 1
 
             elif zone.zone_type == ZoneType.COMMERCIAL:
-                zone.traffic += 2
+                base = 2
 
             elif zone.zone_type == ZoneType.INDUSTRIAL:
-                zone.traffic += 3
+                base = 3
 
-            elif zone.zone_type == ZoneType.PARK:
-                zone.traffic -= 1
+            else:  # Park
+                base = 0
 
-            # Keep traffic within valid bounds
-            zone.traffic = max(0, min(zone.traffic, 100))
+            # -----------------------
+            # Population contribution
+            # -----------------------
+            if zone.population >= 200:
+                population_bonus = 3
+            elif zone.population >= 100:
+                population_bonus = 2
+            elif zone.population >= 50:
+                population_bonus = 1
+            else:
+                population_bonus = 0
+
+            # -----------------------
+            # Employment contribution
+            # -----------------------
+            if zone.employment >= 70:
+                employment_bonus = 3
+            elif zone.employment >= 40:
+                employment_bonus = 2
+            elif zone.employment >= 20:
+                employment_bonus = 1
+            else:
+                employment_bonus = 0
+
+            # -----------------------
+            # Final traffic
+            # -----------------------
+            zone.traffic = max(
+                0,
+                min(base + population_bonus + employment_bonus, 100)
+            )

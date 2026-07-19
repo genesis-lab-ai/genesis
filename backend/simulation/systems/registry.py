@@ -6,9 +6,9 @@ from simulation.systems.happiness import HappinessSystem
 
 
 SYSTEMS = [
-    PopulationSystem,
     TrafficSystem,
     PollutionSystem,
-    EconomySystem,
     HappinessSystem,
+    EconomySystem,
+    PopulationSystem,
 ]

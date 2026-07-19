@@ -20,24 +20,47 @@ class PopulationSystem:
 
             growth = 0
 
-            # Happy citizens attract more residents.
-            if zone.happiness >= 85:
+            # -----------------------
+            # Happiness
+            # -----------------------
+            if zone.happiness >= 80:
                 growth += 3
-            elif zone.happiness >= 70:
+            elif zone.happiness >= 60:
+                growth += 2
+            elif zone.happiness >= 40:
                 growth += 1
             else:
                 growth -= 2
 
-            # Pollution discourages population growth.
-            if zone.pollution >= 60:
+            # -----------------------
+            # Pollution
+            # -----------------------
+            if zone.pollution >= 9:
                 growth -= 3
-            elif zone.pollution >= 40:
+            elif zone.pollution >= 6:
+                growth -= 2
+            elif zone.pollution >= 3:
                 growth -= 1
 
-            # Employment availability attracts residents.
+            # -----------------------
+            # Employment
+            # -----------------------
             if zone.employment >= 70:
                 growth += 2
+            elif zone.employment >= 40:
+                growth += 1
             elif zone.employment <= 20:
                 growth -= 1
 
+            # -----------------------
+            # Land Value
+            # -----------------------
+            if zone.land_value >= 150:
+                growth += 2
+            elif zone.land_value >= 120:
+                growth += 1
+
+            # -----------------------
+            # Apply growth
+            # -----------------------
             zone.population = max(0, zone.population + growth)
